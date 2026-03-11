@@ -1,7 +1,10 @@
 import { useState, useEffect, useRef } from "react"
 import { supabase } from "../apis/cliente"
 
-export default function Canciones() {
+export default function Canciones({ session, onNavigate }) {
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+  }
   const [canciones, setCanciones] = useState([])
   const [loading, setLoading] = useState(true)
   const [actual, setActual] = useState(null)       // canción activa
@@ -51,7 +54,7 @@ export default function Canciones() {
     if (!audioRef.current || !actual) return
     audioRef.current.src = actual.url_audio
     audioRef.current.volume = volumen
-    audioRef.current.play().catch(() => {})
+    audioRef.current.play().catch(() => { })
   }, [actual])
 
   const togglePlay = () => {
@@ -129,16 +132,24 @@ export default function Canciones() {
       {/* Header */}
       <div style={s.header}>
         <div style={s.headerLeft}>
+          {/* Botón volver */}
+          {onNavigate && (
+            <button style={s.backBtn} onClick={() => onNavigate('home')}>
+              ← Inicio
+            </button>
+          )}
+
           <svg width="28" height="28" viewBox="0 0 38 38" fill="none">
-            <circle cx="19" cy="19" r="19" fill="#1DB954"/>
-            <path d="M27 14c-4-2-10-2-15 1" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-            <path d="M26 19c-3.5-1.5-8.5-1.5-13 1" stroke="white" strokeWidth="2.2" strokeLinecap="round"/>
-            <path d="M25 24c-3-1-7-1-10.5.5" stroke="white" strokeWidth="1.8" strokeLinecap="round"/>
+            <circle cx="19" cy="19" r="19" fill="#1DB954" />
+            <path d="M27 14c-4-2-10-2-15 1" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
+            <path d="M26 19c-3.5-1.5-8.5-1.5-13 1" stroke="white" strokeWidth="2.2" strokeLinecap="round" />
+            <path d="M25 24c-3-1-7-1-10.5.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" />
           </svg>
           <span style={s.logoText}>Spotifi</span>
         </div>
         <h1 style={s.pageTitle}>Canciones</h1>
         <span style={s.count}>{canciones.length} canciones</span>
+        <button style={s.logoutBtn} onClick={handleLogout}>Cerrar sesión</button>
       </div>
 
       {/* Lista */}
@@ -304,10 +315,25 @@ const s = {
     padding: "28px 32px 20px",
     borderBottom: "1px solid #1a1a1a",
   },
-  headerLeft: { display: "flex", alignItems: "center", gap: 8 },
+  headerLeft: { display: "flex", alignItems: "center", gap: 12 },
+  backBtn: {
+    background: "transparent",
+    border: "1px solid #333",
+    color: "#888",
+    fontSize: 13,
+    padding: "6px 14px",
+    borderRadius: 20,
+    cursor: "pointer",
+    transition: "all 0.2s",
+  },
   logoText: { fontSize: 18, fontWeight: 800, fontFamily: "'Syne', sans-serif", color: "#fff" },
   pageTitle: { fontSize: 22, fontWeight: 800, fontFamily: "'Syne', sans-serif", flex: 1 },
   count: { fontSize: 13, color: "#555" },
+  logoutBtn: {
+    background: "transparent", border: "1px solid #333",
+    color: "#888", fontSize: 12, padding: "6px 14px",
+    borderRadius: 20, cursor: "pointer",
+  },
 
   lista: { padding: "8px 0" },
 
